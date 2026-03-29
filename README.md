@@ -4,7 +4,8 @@ A web-based bowling bracket calculation system with handicap and scratch options
 
 ## Features
 
-- **Handicap & Scratch Divisions**: Support for both handicap (230 - average) and scratch brackets
+- **Configurable Handicap**: Base score and percentage are adjustable (default: 230 base, 100%)
+- **Handicap & Scratch Divisions**: Support for both handicap and scratch brackets
 - **8-Player Brackets**: Each bracket supports up to 8 bowlers
 - **3-Game Format**: Bowlers play 3 games, total scores determine advancement
 - **Forward & Backward Progression**: Track winners through rounds (Quarter-finals → Semi-finals → Finals → Champion)
@@ -62,6 +63,26 @@ The app will be available at `http://localhost:3002`
 2. Default credentials: `admin@bowling.com` / `admin123`
 3. Create events, add bowlers, and manage brackets
 
+### Configure Handicap Settings
+
+1. Login as admin
+2. Go to **Settings** tab
+3. Adjust:
+   - **Base Score**: The reference score for handicap (default: 230)
+   - **Handicap Percentage**: Multiplier for handicap (default: 100%)
+4. Click **Save Settings** to recalculate all handicaps
+
+### Handicap Formula
+
+```
+Handicap = (Base Score - Average) × Percentage
+```
+
+**Examples:**
+- Base Score: 230, Percentage: 80%
+- Bowler Average: 180
+- Handicap = (230 - 180) × 0.80 = 40 pins
+
 ### Public View
 
 1. Navigate to `/`
@@ -73,6 +94,10 @@ The app will be available at `http://localhost:3002`
 
 ### Authentication
 - `POST /api/auth` - Login, register, verify token
+
+### Settings
+- `GET /api/settings` - Get current handicap settings
+- `PUT /api/settings` - Update base score and percentage
 
 ### Events
 - `GET /api/events` - List all events
@@ -90,21 +115,13 @@ The app will be available at `http://localhost:3002`
 
 ## Database Schema
 
+- **settings**: Configurable base score and handicap percentage
 - **users**: Admin users with email/password
 - **events**: Bowling tournaments/events
 - **bowlers**: Bowler names, averages, handicaps
 - **bracket_entries**: Which bowlers are in which brackets
 - **games**: Individual game scores
 - **bracket_results**: Final standings and progression
-
-## Handicap Calculation
-
-Handicap is calculated as: `max(0, 230 - average)`
-
-Example:
-- Average 180 → Handicap 50
-- Average 220 → Handicap 10
-- Average 230+ → Handicap 0
 
 ## Bracket Progression
 

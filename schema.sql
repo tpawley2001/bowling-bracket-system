@@ -9,6 +9,19 @@ CREATE TABLE IF NOT EXISTS users (
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
+-- Settings table (configurable league settings)
+CREATE TABLE IF NOT EXISTS settings (
+  id INTEGER PRIMARY KEY CHECK (id = 1),
+  base_score INTEGER DEFAULT 230,
+  handicap_percentage INTEGER DEFAULT 100,
+  league_name TEXT DEFAULT 'Bowling League',
+  updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Initialize default settings
+INSERT OR IGNORE INTO settings (id, base_score, handicap_percentage, league_name) 
+VALUES (1, 230, 100, 'Bowling League');
+
 -- Events table (bowling events/tournaments)
 CREATE TABLE IF NOT EXISTS events (
   id INTEGER PRIMARY KEY AUTOINCREMENT,

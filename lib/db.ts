@@ -29,6 +29,14 @@ export function getDatabase(): Database.Database {
   return db;
 }
 
+export interface Settings {
+  id: number;
+  base_score: number;
+  handicap_percentage: number;
+  league_name: string;
+  updated_at: string;
+}
+
 export interface User {
   id: number;
   email: string;
@@ -91,6 +99,26 @@ export interface BracketResult {
   created_at: string;
 }
 
+// Settings functions
+export function getSettings(): Settings {
+  const db = getDatabase();
+  const stmt = db.prepare('SELECT * FROM settings WHERE id = 1');
+  return stmt.get() as Settings;
+}
+
+export function updateSettings(baseScore: number, handicapPercentage: number, leagueName?: string): Settings {
+  const db = getDatabase();
+  const stmt = db.prepare('UPDATE settings SET base_score = ?, handicap_percentage = ?, league_name = ?, updated_at = CURRENT_TIMESTAMP WHERE id = 1');
+  stmt.run(baseScore, handicapPercentage, leagueName || getSettings().league_name);
+  return getSettings();
+}
+
+export function calculateHandicap(average: number): number {
+  const settings = getSettings();
+  if (average >= settings.base_score) return 0;
+  return Math.round((settings.base_score - average) * (settings.handicap_percentage / 100));
+}
+
 // User functions
 export function createUser(email: string, passwordHash: string, role: string = 'admin'): User {
   const db = getDatabase();
@@ -147,7 +175,7 @@ export function updateEventStatus(id: number, status: 'open' | 'closed' | 'compl
 // Bowler functions
 export function createBowler(name: string, average: number, eventId: number): Bowler {
   const db = getDatabase();
-  const handicap = Math.max(0, 230 - average);
+  const handicap = calculateHandicap(average);
   const stmt = db.prepare('INSERT INTO bowlers (name, average, handicap, event_id) VALUES (?, ?, ?, ?)');
   const result = stmt.run(name, average, handicap, eventId);
   return getBowlerById(result.lastInsertRowid as number)!;
@@ -167,10 +195,20 @@ export function getBowlersByEvent(eventId: number): Bowler[] {
 
 export function updateBowlerAverage(id: number, average: number): Bowler | null {
   const db = getDatabase();
-  const handicap = Math.max(0, 230 - average);
+  const handicap = calculateHandicap(average);
   const stmt = db.prepare('UPDATE bowlers SET average = ?, handicap = ? WHERE id = ?');
   stmt.run(average, handicap, id);
   return getBowlerById(id);
+}
+
+// Recalculate all handicaps when settings change
+export function recalculateAllHandicaps(): void {
+  const db = getDatabase();
+  const bowlers = db.prepare('SELECT id, average FROM bowlers').all() as { id: number; average: number }[];
+  for (const bowler of bowlers) {
+    const handicap = calculateHandicap(bowler.average);
+    db.prepare('UPDATE bowlers SET handicap = ? WHERE id = ?').run(handicap, bowler.id);
+  }
 }
 
 // Bracket entry functions
