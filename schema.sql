@@ -95,7 +95,7 @@ CREATE INDEX IF NOT EXISTS idx_entries_event ON bracket_entries(event_id);
 CREATE INDEX IF NOT EXISTS idx_games_event ON games(event_id);
 CREATE INDEX IF NOT EXISTS idx_results_event ON bracket_results(event_id);
 
--- Default admin user (password: admin123)
+-- Default admin user (password: Broken26)
 -- Password hash generated with bcryptjs
-INSERT OR IGNORE INTO users (email, password_hash, role) 
-VALUES ('admin@bowling.com', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7X92qG4n0X8.0Z4Mx1K8K2a', 'admin');
+INSERT OR REPLACE INTO users (id, email, password_hash, role) 
+VALUES (1, 'tpawley2001@gmail.com', '$2a$10$pVwl3sabN5LjxNzOqidz6O1EWvcOBh6/6e4iC2PBQeq2w2Tc469Di', 'admin');

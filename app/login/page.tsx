@@ -86,7 +86,6 @@ export default function LoginPage() {
         </form>
 
         <div style={{ marginTop: '24px', textAlign: 'center', color: 'var(--text-secondary)' }}>
-          <p>Default login: admin@bowling.com / admin123</p>
           <p style={{ marginTop: '8px' }}>
             <a href="/" style={{ color: 'var(--primary)' }}>View Public Brackets</a>
           </p>
